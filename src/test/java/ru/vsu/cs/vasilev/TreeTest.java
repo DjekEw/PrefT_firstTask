@@ -2,7 +2,7 @@ package ru.vsu.cs.vasilev;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
-import tree.Trie;
+import tree.PrefT_firstTask;
 
 import java.util.Collection;
 
