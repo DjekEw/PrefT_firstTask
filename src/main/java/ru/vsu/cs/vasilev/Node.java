@@ -1,8 +1,5 @@
 package ru.vsu.cs.vasilev;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +14,12 @@ class Node {
 
     private boolean isEndOfString = false;
 
-    private Node(char key, @NotNull String string) {
+    private Node(char key, String string) {
+        if (string == null) {
+            throw new RuntimeException();
+        }
+        else
+        {
         this.key = key;
         children = new HashMap<>();
 
@@ -26,31 +28,42 @@ class Node {
         } else {
             add(string);
         }
+        }
     }
 
     static Node rootNode() {
         return new Node(EMPTY_KEY, "");
     }
 
-    boolean add(@NotNull String string) {
-        if (string.isEmpty()) {
-            boolean contained = isEndOfString;
-            isEndOfString = true;
-
-            return !contained;
+    boolean add(String string) {
+        if (string == null) {
+            throw new RuntimeException();
         }
+        else {
+            if (string.isEmpty()) {
+                boolean contained = isEndOfString;
+                isEndOfString = true;
 
-        char nextKey = string.charAt(0);
+                return !contained;
+            }
 
-        if (children.containsKey(nextKey)) {
-            return children.get(nextKey).add(string.substring(1));
+            char nextKey = string.charAt(0);
+
+            if (children.containsKey(nextKey)) {
+                return children.get(nextKey).add(string.substring(1));
+            }
+
+            children.put(nextKey, new Node(nextKey, string.substring(1)));
+            return true;
         }
-
-        children.put(nextKey, new Node(nextKey, string.substring(1)));
-        return true;
     }
 
-    boolean remove(@NotNull String string) {
+    boolean remove(String string) {
+        if (string == null) {
+            throw new RuntimeException();
+        }
+        else
+        {
         if (string.isEmpty()) {
             boolean contained = isEndOfString;
 
@@ -64,30 +77,41 @@ class Node {
 
         return children.get(nextKey).remove(string.substring(1));
     }
-
-    @Nullable Node findChildByPrefix(@NotNull String prefix) {
-        if (prefix.isEmpty())
-            return this;
-
-        char nextKey = prefix.charAt(0);
-
-        if (!children.containsKey(nextKey))
-            return null;
-
-        return children.get(nextKey).findChildByPrefix(prefix.substring(1));
     }
 
-    @NotNull Collection<String> getAllStringsForThisBranch(@NotNull Collection<String> strings, @NotNull StringBuilder prefix) {
-        prefix.append(key);
-        if (isEndOfString) {
-            strings.add(prefix.toString());
+    Node findChildByPrefix(String prefix) {
+        if (prefix == null) {
+            throw new RuntimeException();
         }
+        else {
+            if (prefix.isEmpty())
+                return this;
 
-        for (Node node : children.values()) {
-            node.getAllStringsForThisBranch(strings, prefix);
+            char nextKey = prefix.charAt(0);
+
+            if (!children.containsKey(nextKey))
+                return null;
+
+            return children.get(nextKey).findChildByPrefix(prefix.substring(1));
         }
-        prefix.deleteCharAt(prefix.length() - 1);
+    }
 
-        return strings;
+    Collection<String> getAllStringsForThisBranch(Collection<String> strings, StringBuilder prefix) {
+        if (prefix == null || strings == null) {
+            throw new RuntimeException();
+        }
+        else {
+            prefix.append(key);
+            if (isEndOfString) {
+                strings.add(prefix.toString());
+            }
+
+            for (Node node : children.values()) {
+                node.getAllStringsForThisBranch(strings, prefix);
+            }
+            prefix.deleteCharAt(prefix.length() - 1);
+
+            return strings;
+        }
     }
 }
